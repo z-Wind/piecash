@@ -18,10 +18,11 @@ requests==2.18.4
 pandas==0.20.3
 
 # Documentation
-Sphinx
+Sphinx==1.6.5
 sphinxcontrib-napoleon==0.4.3
 ipyext==0.1.0
 ipython==4.0.0
+sphinx-autodoc-annotation
 
 # Miscellaneous
 Paver==1.2.4
