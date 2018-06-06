@@ -12,7 +12,11 @@ from decimal import Decimal
 from time import sleep
 
 import pytz
-import requests
+
+try:
+    import requests
+except ImportError:
+    print("You need to install requests to use the 'yahoo' import")
 
 MAX_ATTEMPT = 5
 

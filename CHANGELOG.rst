@@ -1,6 +1,13 @@
 What's new
 ==========
 
+
+Version 0.19.0 (2018-06-06)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+- remove dependency on requests (fix #90)
+- rollback schema of lock table to lower cap column names (fix #92)
+
 Version 0.18.0 (2018-04-24)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
