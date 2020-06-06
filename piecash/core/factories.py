@@ -29,7 +29,9 @@ def create_stock_accounts(cdty, broker_account, income_account=None, income_acco
         and the list of income accounts.
     """
     if cdty.namespace == "CURRENCY":
-        raise GnucashException("{} is a currency ! You can't create stock_accounts for currencies".format(cdty))
+        raise GnucashException(
+            "{} is a currency ! You can't create stock_accounts for currencies".format(cdty)
+        )
 
     from .account import Account
 
@@ -86,13 +88,14 @@ def create_currency_from_ISO(isocode):
         raise ValueError("Could not find the ISO code '{}' in the ISO table".format(isocode))
 
     # create the currency
-    cdty = Commodity(mnemonic=cur.mnemonic,
-                     fullname=cur.currency,
-                     fraction=10 ** int(cur.fraction),
-                     cusip=cur.cusip,
-                     namespace="CURRENCY",
-                     quote_flag=1,
-                     )
+    cdty = Commodity(
+        mnemonic=cur.mnemonic,
+        fullname=cur.currency,
+        fraction=10 ** int(cur.fraction),
+        cusip=cur.cusip,
+        namespace="CURRENCY",
+        quote_flag=1,
+    )
 
     # self.gnc_session.add(cdty)
     return cdty
@@ -122,14 +125,15 @@ def create_stock_from_symbol(symbol, book=None):
 
     share = get_latest_quote(symbol)
 
-    stock = Commodity(mnemonic=symbol,
-                      fullname=share.name,
-                      fraction=10000,
-                      namespace=share.exchange,
-                      quote_flag=1,
-                      quote_source="yahoo",
-                      quote_tz=share.timezone,
-                      )
+    stock = Commodity(
+        mnemonic=symbol,
+        fullname=share.name,
+        fraction=10000,
+        namespace=share.exchange,
+        quote_flag=1,
+        quote_source="yahoo",
+        quote_tz=share.timezone,
+    )
 
     if book:
         book.session.add(stock)
@@ -137,13 +141,9 @@ def create_stock_from_symbol(symbol, book=None):
     return stock
 
 
-def single_transaction(post_date,
-                       enter_date,
-                       description,
-                       value,
-                       from_account,
-                       to_account):
+def single_transaction(post_date, enter_date, description, value, from_account, to_account):
     from . import Transaction, Split
+
     # currency is derived from "from_account" (as in GUI)
     currency = from_account.commodity
     # currency of other destination account should be identical (as only one value given)
@@ -153,8 +153,6 @@ def single_transaction(post_date,
         post_date=post_date,
         enter_date=enter_date,
         description=description,
-        splits=[
-            Split(account=from_account, value=-value),
-            Split(account=to_account, value=value),
-        ])
+        splits=[Split(account=from_account, value=-value), Split(account=to_account, value=value)],
+    )
     return tx

@@ -43,7 +43,9 @@ def realbook_session_multithread(request):
 
 @pytest.fixture
 def ghost_kvp_scheduled_transaction_session(request):
-    return use_copied_book(request, file_ghost_kvp_scheduled_transaction, file_ghost_kvp_scheduled_transaction_for_test)
+    return use_copied_book(
+        request, file_ghost_kvp_scheduled_transaction, file_ghost_kvp_scheduled_transaction_for_test
+    )
 
 
 def use_copied_book(request, template_filename, test_filename, check_same_thread=True):
@@ -90,7 +92,10 @@ class TestIntegration_EmptyBook(object):
             "vtime": datetime.datetime.now(),
             "vnum": Decimal("4.53"),
             "vlist": ["stri", 4, dict(foo=23)],
-            "vdct": {"spl": 2.3, "vfr": {"vfr2": {"foo": 33, "baz": "hello"}, "coo": Decimal("4.53")}},
+            "vdct": {
+                "spl": 2.3,
+                "vfr": {"vfr2": {"foo": 33, "baz": "hello"}, "coo": Decimal("4.53")},
+            },
         }
         for k, v in kv.items():
             book[k] = v
@@ -135,7 +140,13 @@ class TestIntegration_EmptyBook(object):
             b["a/b/c"] = True
 
         book.flush()
-        assert {n for (n,) in book.session.query(Slot._name)} == {"a", "a/b", "a/b/c", "a/b/c/d", "a/b/c/d/f"}
+        assert {n for (n,) in book.session.query(Slot._name)} == {
+            "a",
+            "a/b",
+            "a/b/c",
+            "a/b/c/d",
+            "a/b/c/d/f",
+        }
 
         # delete some elements
         del b["a"]["b"][:]
@@ -182,7 +193,13 @@ class TestIntegration_EmptyBook(object):
         assert all(acc.type == "ROOT" for acc in accs)
 
     def test_is_parent_child_types_consistent(self):
-        combi_OK = [("ROOT", "BANK"), (None, "ROOT"), ("ROOT", "EQUITY"), ("ROOT", "ASSET"), ("ROOT", "EXPENSE")]
+        combi_OK = [
+            ("ROOT", "BANK"),
+            (None, "ROOT"),
+            ("ROOT", "EQUITY"),
+            ("ROOT", "ASSET"),
+            ("ROOT", "EXPENSE"),
+        ]
 
         combi_not_OK = [
             ("ROOT", "ROOT"),

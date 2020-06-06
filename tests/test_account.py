@@ -106,8 +106,13 @@ class TestAccount_create_account(object):
         racc = new_book.root_account
 
         # create account with unknown type
-        acc = Account(name="test account", type="ASSET", commodity=EUR, parent=racc,
-                      children=[Account(name="test sub-account", type="ASSET", commodity=EUR)])
+        acc = Account(
+            name="test account",
+            type="ASSET",
+            commodity=EUR,
+            parent=racc,
+            children=[Account(name="test sub-account", type="ASSET", commodity=EUR)],
+        )
         new_book.flush()
         assert len(acc.children) == 1
 

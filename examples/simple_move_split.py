@@ -14,14 +14,11 @@ with create_book() as book:
     T = 100
 
     # create accounts
-    accounts = [Account("account {}".format(i), "ASSET", eur, parent=ra)
-                for i in range(N)]
+    accounts = [Account("account {}".format(i), "ASSET", eur, parent=ra) for i in range(N)]
 
     # create transactions
     for i, v in enumerate(random.randrange(10) for j in range(T)):
-        tx = Transaction(eur,
-                         "transaction {}".format(i),
-        )
+        tx = Transaction(eur, "transaction {}".format(i))
         Split(accounts[random.randrange(N)], value=v, transaction=tx)
         Split(accounts[random.randrange(N)], value=-v, transaction=tx)
     book.save()
@@ -48,6 +45,6 @@ with create_book() as book:
     tx = book.transactions[0]
     tx.splits[0].account.placeholder = 1
     book.save()
-    tx.description="foo"
+    tx.description = "foo"
     with pytest.raises(GncValidationError):
         book.save()

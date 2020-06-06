@@ -45,7 +45,10 @@ class TestBook_create_book(object):
         assert isinstance(new_book.session, Session)
         assert new_book.uri is not None
         assert new_book.session.bind.name in ["sqlite", "postgresql", "mysql"]
-        assert repr(new_book.query(Version).filter_by(table_name="commodities").one()) == "Version<commodities=1>"
+        assert (
+            repr(new_book.query(Version).filter_by(table_name="commodities").one())
+            == "Version<commodities=1>"
+        )
 
         EUR = new_book.commodities[0]
         assert EUR.mnemonic == "EUR"
@@ -473,7 +476,10 @@ class TestBook_access_book(object):
         Tests business slots
         :type book_reference_2_6_21_fulloptions: Book
         """
-        assert book_reference_3_0_0_fulloptions.business_company_address == "Rue de la Chenille éclairée, 22"
+        assert (
+            book_reference_3_0_0_fulloptions.business_company_address
+            == "Rue de la Chenille éclairée, 22"
+        )
         assert book_reference_3_0_0_fulloptions.business_company_contact == "John Michu"
         assert book_reference_3_0_0_fulloptions.business_company_email == "woozie@example.com"
         assert book_reference_3_0_0_fulloptions.business_company_ID == "SIREN 123 456 789"

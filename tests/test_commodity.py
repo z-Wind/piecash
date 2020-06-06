@@ -8,8 +8,16 @@ import pytest
 
 from piecash import Price, Commodity, GnucashException
 from piecash.core.commodity import GncPriceError
-from test_helper import db_sqlite_uri, db_sqlite, new_book, new_book_USD, book_uri, book_basic, \
-    is_inmemory_sqlite, needweb
+from test_helper import (
+    db_sqlite_uri,
+    db_sqlite,
+    new_book,
+    new_book_USD,
+    book_uri,
+    book_basic,
+    is_inmemory_sqlite,
+    needweb,
+)
 
 # dummy line to avoid removing unused symbols
 a = db_sqlite_uri, db_sqlite, new_book, new_book_USD, book_uri, book_basic
@@ -44,7 +52,7 @@ class TestCommodity_create_commodity(object):
 
         # should trigger creation of USD currency
         cdty["quoted_currency"] = "USD"
-        assert cdty.base_currency.mnemonic == 'USD'
+        assert cdty.base_currency.mnemonic == "USD"
         book_basic.flush()
         assert cdty.base_currency == book_basic.currencies(mnemonic="USD")
 
@@ -67,14 +75,14 @@ class TestCommodity_create_prices(object):
     def test_create_basicprice(self, book_basic):
         EUR = book_basic.commodities(namespace="CURRENCY")
         USD = book_basic.currencies(mnemonic="USD")
-        p = Price(commodity=USD, currency=EUR, date=date(2014, 2, 22), value=Decimal('0.54321'))
+        p = Price(commodity=USD, currency=EUR, date=date(2014, 2, 22), value=Decimal("0.54321"))
 
         # check price exist
         np = USD.prices.first()
         assert np is p
         assert repr(p) == "Price<2014-02-22 : 0.54321 EUR/USD>"
 
-        p2 = Price(commodity=USD, currency=EUR, date=date(2014, 2, 21), value=Decimal('0.12345'))
+        p2 = Price(commodity=USD, currency=EUR, date=date(2014, 2, 21), value=Decimal("0.12345"))
         book_basic.flush()
         assert p.value + p2.value == Decimal("0.66666")
         assert len(USD.prices.all()) == 2
@@ -82,12 +90,12 @@ class TestCommodity_create_prices(object):
     def test_create_duplicateprice(self, book_basic):
         EUR = book_basic.commodities(namespace="CURRENCY")
         USD = book_basic.currencies(mnemonic="USD")
-        p = Price(commodity=USD, currency=EUR, date=date(2014, 2, 22), value=Decimal('0.54321'))
-        p1 = Price(commodity=USD, currency=EUR, date=date(2014, 2, 22), value=Decimal('0.12345'))
+        p = Price(commodity=USD, currency=EUR, date=date(2014, 2, 22), value=Decimal("0.54321"))
+        p1 = Price(commodity=USD, currency=EUR, date=date(2014, 2, 22), value=Decimal("0.12345"))
 
         book_basic.flush()
-        assert USD.prices.filter_by(value=Decimal('0')).all() == []
-        assert USD.prices.filter_by(value=Decimal('0.12345')).one() == p1
+        assert USD.prices.filter_by(value=Decimal("0")).all() == []
+        assert USD.prices.filter_by(value=Decimal("0.12345")).one() == p1
 
         with pytest.raises(ValueError):
             book_basic.validate()
@@ -95,12 +103,24 @@ class TestCommodity_create_prices(object):
     def test_create_duplicateprice_different_source(self, book_basic):
         EUR = book_basic.commodities(namespace="CURRENCY")
         USD = book_basic.currencies(mnemonic="USD")
-        p = Price(commodity=USD, currency=EUR, date=date(2014, 2, 22), value=Decimal('0.54321'), source="user:price")
-        p1 = Price(commodity=USD, currency=EUR, date=date(2014, 2, 22), value=Decimal('0.12345'), source="other:price")
+        p = Price(
+            commodity=USD,
+            currency=EUR,
+            date=date(2014, 2, 22),
+            value=Decimal("0.54321"),
+            source="user:price",
+        )
+        p1 = Price(
+            commodity=USD,
+            currency=EUR,
+            date=date(2014, 2, 22),
+            value=Decimal("0.12345"),
+            source="other:price",
+        )
 
         book_basic.flush()
-        assert USD.prices.filter_by(value=Decimal('0')).all() == []
-        assert USD.prices.filter_by(value=Decimal('0.12345')).one() == p1
+        assert USD.prices.filter_by(value=Decimal("0")).all() == []
+        assert USD.prices.filter_by(value=Decimal("0.12345")).one() == p1
 
         # validation should work as different sources
         book_basic.validate()

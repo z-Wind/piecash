@@ -20,8 +20,10 @@ from sqlalchemy.orm import sessionmaker, object_session
 
 
 def __init__blocked(self, *args, **kwargs):
-    raise NotImplementedError("Objects of type {} cannot be created from scratch "
-                              "(only read)".format(self.__class__.__name__))
+    raise NotImplementedError(
+        "Objects of type {} cannot be created from scratch "
+        "(only read)".format(self.__class__.__name__)
+    )
 
 
 @as_declarative(constructor=__init__blocked)
@@ -56,8 +58,7 @@ class DeclarativeBase(object):
         try:
             return self.book.session._all_changes[id(self)]
         except KeyError:
-            return {"STATE_CHANGES": ["unchanged"],
-                    "OBJECT": self}
+            return {"STATE_CHANGES": ["unchanged"], "OBJECT": self}
 
     def __repr__(self):
         return str(self)
@@ -67,12 +68,12 @@ tz = tzlocal.get_localzone()
 utc = pytz.utc
 
 
-@compiles(sqlite.DATE, 'sqlite')
+@compiles(sqlite.DATE, "sqlite")
 def compile_date(element, compiler, **kw):
     return "TEXT(8)"  # % element.__class__.__name__
 
 
-@compiles(sqlite.DATETIME, 'sqlite')
+@compiles(sqlite.DATETIME, "sqlite")
 def compile_datetime(element, compiler, **kw):
     """ data type for the date field
 
@@ -84,6 +85,7 @@ def compile_datetime(element, compiler, **kw):
 class _DateTime(types.TypeDecorator):
     """Used to customise the DateTime type for sqlite (ie without the separators as in gnucash
     """
+
     impl = types.TypeEngine
 
     def load_dialect_impl(self, dialect):
@@ -97,10 +99,13 @@ class _DateTime(types.TypeDecorator):
 
     def process_bind_param(self, value, dialect):
         if value is not None:
-            assert isinstance(value, datetime.datetime), "value {} is not of type datetime.datetime but type {}".format(
-                value, type(value))
+            assert isinstance(
+                value, datetime.datetime
+            ), "value {} is not of type datetime.datetime but type {}".format(value, type(value))
             if value.microsecond != 0:
-                logging.warning("A datetime has been given with microseconds which are not saved in the database")
+                logging.warning(
+                    "A datetime has been given with microseconds which are not saved in the database"
+                )
 
             if not value.tzinfo:
                 value = tz.localize(value)
@@ -115,6 +120,7 @@ class _DateTime(types.TypeDecorator):
 class _DateAsDateTime(types.TypeDecorator):
     """Used to customise the DateTime type for sqlite (ie without the separators as in gnucash
     """
+
     impl = types.TypeEngine
 
     def __init__(self, neutral_time=True, *args, **kwargs):
@@ -132,13 +138,15 @@ class _DateAsDateTime(types.TypeDecorator):
 
     def process_bind_param(self, value, dialect):
         if value is not None:
-            assert isinstance(value, datetime.date) and not isinstance(value, datetime.datetime), \
-                "value {} is not of type datetime.date but type {}".format(value, type(value))
+            assert isinstance(value, datetime.date) and not isinstance(
+                value, datetime.datetime
+            ), "value {} is not of type datetime.date but type {}".format(value, type(value))
             if self.neutral_time:
                 result = datetime.datetime.combine(value, datetime.time(10, 59, 0))
             else:
-                result = tz.localize(datetime.datetime.combine(value, datetime.time(0, 0, 0))) \
-                    .astimezone(utc)
+                result = tz.localize(
+                    datetime.datetime.combine(value, datetime.time(0, 0, 0))
+                ).astimezone(utc)
             return result.replace(tzinfo=None)
 
     def process_result_value(self, value, dialect):
@@ -150,14 +158,14 @@ class _DateAsDateTime(types.TypeDecorator):
 class _Date(types.TypeDecorator):
     """Used to customise the DateTime type for sqlite (ie without the separators as in gnucash
     """
+
     impl = types.TypeEngine
     is_sqlite = False
 
     def load_dialect_impl(self, dialect):
         if dialect.name == "sqlite":
             return sqlite.DATE(
-                storage_format="%(year)04d%(month)02d%(day)02d",
-                regexp=r"(\d{4})(\d{2})(\d{2})"
+                storage_format="%(year)04d%(month)02d%(day)02d", regexp=r"(\d{4})(\d{2})(\d{2})"
             )
         else:
             return types.Date()
@@ -183,15 +191,10 @@ def mapped_to_slot_property(col, slot_name, slot_transform=lambda x: x):
     def expr(cls):
         return col
 
-    return hybrid_property(
-        fget=fget,
-        fset=fset,
-        expr=expr,
-    )
+    return hybrid_property(fget=fget, fset=fset, expr=expr)
 
 
-def pure_slot_property(slot_name, slot_transform=lambda x: x,
-                       ignore_invalid_slot=False):
+def pure_slot_property(slot_name, slot_transform=lambda x: x, ignore_invalid_slot=False):
     """
     Create a property (class must have slots) that maps to a slot
 
@@ -222,10 +225,7 @@ def pure_slot_property(slot_name, slot_transform=lambda x: x,
         else:
             self[slot_name] = v
 
-    return hybrid_property(
-        fget=fget,
-        fset=fset,
-    )
+    return hybrid_property(fget=fget, fset=fset)
 
 
 def kvp_attribute(name, to_gnc=lambda v: v, from_gnc=lambda v: v, default=None):
@@ -255,12 +255,7 @@ def get_foreign_keys(metadata, engine):
     """
     reflected_metadata = MetaData()
     for table_name in list(metadata.tables.keys()):
-        table = Table(
-            table_name,
-            reflected_metadata,
-            autoload=True,
-            autoload_with=engine,
-        )
+        table = Table(table_name, reflected_metadata, autoload=True, autoload_with=engine)
 
         for constraint in table.constraints:
             if not isinstance(constraint, ForeignKeyConstraint):
@@ -307,7 +302,9 @@ class ChoiceType(types.TypeDecorator):
             return [k for k, v in self.choices.items() if v == value][0]
         except IndexError:
             # print("Value '{}' is not in [{}]".format(", ".join(self.choices.values())))
-            raise ValueError("Value '{}' is not in choices [{}]".format(value, ", ".join(self.choices.values())))
+            raise ValueError(
+                "Value '{}' is not in choices [{}]".format(value, ", ".join(self.choices.values()))
+            )
 
     def process_result_value(self, value, dialect):
         return self.choices[value]

@@ -9,7 +9,15 @@ import tzlocal
 
 from piecash import GnucashException, Commodity
 from piecash.core import factories
-from test_helper import db_sqlite_uri, db_sqlite, new_book, new_book_USD, book_uri, book_basic, needweb
+from test_helper import (
+    db_sqlite_uri,
+    db_sqlite,
+    new_book,
+    new_book_USD,
+    book_uri,
+    book_basic,
+    needweb,
+)
 
 # dummy line to avoid removing unused symbols
 

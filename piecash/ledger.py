@@ -18,30 +18,37 @@ def attach_ledger(cls):
 @attach_ledger(Transaction)
 def ledger(tr):
     """Return a ledger-cli alike representation of the transaction"""
-    s = ["{:%Y-%m-%d} {}{}\n".format(tr.post_date,
-                                       "({}) ".format(tr.num.replace(")", "")) if tr.num else "",
-                                       tr.description)]
+    s = [
+        "{:%Y-%m-%d} {}{}\n".format(
+            tr.post_date, "({}) ".format(tr.num.replace(")", "")) if tr.num else "", tr.description
+        )
+    ]
     if tr.notes:
         s.append("\t;{}\n".format(tr.notes))
     for split in tr.splits:
         if split.account.commodity.mnemonic == "template":
             return ""
-        if split.reconcile_state in ['c', 'y']:
+        if split.reconcile_state in ["c", "y"]:
             s.append("\t* {:38}  ".format(split.account.fullname))
         else:
             s.append("\t{:40}  ".format(split.account.fullname))
         if split.account.commodity != tr.currency:
-            s.append("{:10.{}f} {} @@ {:.{}f} {}".format(
-                split.quantity,
-                split.account.commodity.precision,
-                format_commodity(split.account.commodity),
-                abs(split.value),
-                tr.currency.precision,
-                format_commodity(tr.currency)))
+            s.append(
+                "{:10.{}f} {} @@ {:.{}f} {}".format(
+                    split.quantity,
+                    split.account.commodity.precision,
+                    format_commodity(split.account.commodity),
+                    abs(split.value),
+                    tr.currency.precision,
+                    format_commodity(tr.currency),
+                )
+            )
         else:
-            s.append("{:10.{}f} {}".format(split.value,
-                                           tr.currency.precision,
-                                           format_commodity(tr.currency)))
+            s.append(
+                "{:10.{}f} {}".format(
+                    split.value, tr.currency.precision, format_commodity(tr.currency)
+                )
+            )
         if split.memo:
             s.append(" ;   {:20}".format(split.memo))
         s.append("\n")
@@ -52,11 +59,11 @@ def ledger(tr):
 def format_commodity(commodity):
     mnemonic = commodity.mnemonic
     try:
-        if mnemonic.encode('ascii').isalpha():
+        if mnemonic.encode("ascii").isalpha():
             return mnemonic
     except:
         pass
-    return "\"{}\"".format(mnemonic)  # TODO: escape " char in mnemonic
+    return '"{}"'.format(mnemonic)  # TODO: escape " char in mnemonic
 
 
 @attach_ledger(Commodity)
@@ -79,21 +86,20 @@ def ledger(acc):
         return ""
     if acc.commodity.mnemonic == "template":
         return ""
-    res = "account {}\n".format(acc.fullname, )
+    res = "account {}\n".format(acc.fullname)
     if acc.description != "":
-        res += "\tnote {}\n".format(acc.description, )
+        res += "\tnote {}\n".format(acc.description)
 
-    res += "\tcheck commodity == \"{}\"\n".format(format_commodity(acc.commodity).replace("\"", "\\\""))
+    res += '\tcheck commodity == "{}"\n'.format(format_commodity(acc.commodity).replace('"', '\\"'))
     return res
 
 
 @attach_ledger(Price)
 def ledger(price):
     """Return a ledger-cli alike representation of the price"""
-    return "P {:%Y-%m-%d %H:%M:%S} {} {} {}\n".format(price.date,
-                                                      format_commodity(price.commodity),
-                                                      price.value,
-                                                      format_commodity(price.currency))
+    return "P {:%Y-%m-%d %H:%M:%S} {} {} {}\n".format(
+        price.date, format_commodity(price.commodity), price.value, format_commodity(price.currency)
+    )
 
 
 @attach_ledger(Book)
